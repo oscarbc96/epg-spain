@@ -1,0 +1,54 @@
+name: update
+
+on:
+  schedule:
+    - cron: '30 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Clone iptv-org/epg
+        run: git clone --depth 1 -b master https://github.com/iptv-org/epg.git /tmp/epg
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: /tmp/epg
+
+      - name: Build channel list from the live Movistar Plus+ lineup
+        run: node scripts/build_channels.mjs --output=/tmp/epg/spain.channels.xml --map=channels/xmltv_ids.json
+
+      - name: Grab EPG
+        run: npm run grab --- --channels=spain.channels.xml --output=$GITHUB_WORKSPACE/public/guide.xml --days=3 --maxConnections=10 --gzip
+        working-directory: /tmp/epg
+
+      - name: Validate guide and build index page
+        run: node scripts/build_site.mjs --guide=public/guide.xml --output=public
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - uses: actions/deploy-pages@v4
+        id: deployment
