@@ -1,6 +1,6 @@
 # epg-spain
 
-Daily-updated XMLTV guide for Spain (~276 channels, logos included): the full [Movistar Plus+](https://www.movistarplus.es/programacion-tv) lineup plus everything Orange TV carries that Movistar doesn't — TV3 and the rest of the autonómicas (3Cat Info, À Punt, IB3, ETB, TVG, Canal Sur, CMM, Aragón…), local stations, FDF, AMC, Nick, NatGeo… — plus Esport3 and SX3 via El País. Generated with [iptv-org/epg](https://github.com/iptv-org/epg) and published on GitHub Pages.
+Daily-updated XMLTV guide for Spain (~277 channels, logos included): the full [Movistar Plus+](https://www.movistarplus.es/programacion-tv) lineup plus everything Orange TV carries that Movistar doesn't — TV3 and the rest of the autonómicas (3Cat Info, À Punt, IB3, ETB, TVG, Canal Sur, CMM, Aragón…), local stations, FDF, AMC, Nick, NatGeo… — plus Esport3 and SX3 via El País, and TAC12 (Camp de Tarragona) via a custom [La Xarxa](sites/laxarxa.cat/laxarxa.cat.config.js) site config. Generated with [iptv-org/epg](https://github.com/iptv-org/epg) and published on GitHub Pages.
 
 Successor of [epg_generator](https://github.com/oscarbc96/epg_generator).
 
@@ -25,7 +25,7 @@ A [GitHub Actions workflow](.github/workflows/update.yml) runs every day at 04:3
 Notes:
 
 - Movistar's site config in iptv-org/epg pins `demarcation=18`, so regional variants from other demarcations return no programmes; the autonómicas come from Orange instead (`DEMARCATION` env var overrides it if that ever changes).
-- TAC12 (Tarragona) exists in the iptv-org database but no EPG source publishes its schedule, so it can't be included yet.
+- No iptv-org site covers TAC12, so `sites/laxarxa.cat/` adds a custom config for La Xarxa's grid widget (`graella.laxarxa.cat/grid-<id>.js`, ~12 days of schedule inline); the workflow copies it into the iptv-org/epg clone. Other Catalan local stations using the same widget can be added with just their grid id.
 
 ## Run locally
 

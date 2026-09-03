@@ -39,7 +39,9 @@ interface OrangeChannel {
 
 const EXTRAS: Omit<Entry, 'logo'>[] = [
   { site: 'programacion-tv.elpais.com', site_id: '672', name: 'Esport3', xmltv_id: 'Esport3.es' },
-  { site: 'programacion-tv.elpais.com', site_id: '541', name: 'SX3', xmltv_id: 'SX3.es' }
+  { site: 'programacion-tv.elpais.com', site_id: '541', name: 'SX3', xmltv_id: 'SX3.es' },
+  // TAC12 (Camp de Tarragona) via La Xarxa's grid widget — see sites/laxarxa.cat/
+  { site: 'laxarxa.cat', site_id: '6112', name: 'TAC12', xmltv_id: 'Tac12.es' }
 ]
 
 const args: Record<string, string> = Object.fromEntries(

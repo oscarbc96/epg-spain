@@ -28,6 +28,9 @@ jobs:
       - name: Clone iptv-org/epg
         run: git clone --depth 1 -b master https://github.com/iptv-org/epg.git /tmp/epg
 
+      - name: Add custom site configs
+        run: cp -r sites/. /tmp/epg/sites/
+
       - name: Install dependencies
         run: npm install
         working-directory: /tmp/epg
