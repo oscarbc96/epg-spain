@@ -1,13 +1,13 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 // Validates the grabbed guide and generates the GitHub Pages index.html.
 // Fails (exit 1) if the guide looks broken, so a bad run never gets deployed.
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const MIN_CHANNELS = 100
-const MIN_PROGRAMMES = 1000
+const MIN_CHANNELS = 200
+const MIN_PROGRAMMES = 5000
 
-const args = Object.fromEntries(
+const args: Record<string, string> = Object.fromEntries(
   process.argv.slice(2).map(arg => {
     const [key, ...rest] = arg.replace(/^--/, '').split('=')
     return [key, rest.join('=')]
@@ -15,13 +15,15 @@ const args = Object.fromEntries(
 )
 
 if (!args.guide || !args.output) {
-  console.error('Usage: build_site.mjs --guide=public/guide.xml --output=public')
+  console.error('Usage: build_site.ts --guide=public/guide.xml --output=public')
   process.exit(1)
 }
 
 const xml = readFileSync(args.guide, 'utf8')
 
-const channelMatches = [...xml.matchAll(/<channel id="([^"]*)"><display-name>([^<]*)<\/display-name>(?:<icon src="([^"]*)"\/>)?/g)]
+const channelMatches = [
+  ...xml.matchAll(/<channel id="([^"]*)"><display-name>([^<]*)<\/display-name>(?:<icon src="([^"]*)"\/>)?/g)
+]
 const programmeCount = (xml.match(/<programme /g) || []).length
 const iconCount = channelMatches.filter(match => match[3]).length
 
@@ -38,8 +40,8 @@ if (programmeCount < MIN_PROGRAMMES) {
 
 const updatedAt = new Date().toISOString().replace('T', ' ').slice(0, 16) + ' UTC'
 
-const escape = value =>
-  String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+const escape = (value: string) =>
+  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
 const channelCells = channelMatches
   .map(([, id, name, icon]) => {
@@ -78,7 +80,7 @@ const html = `<!doctype html>
 <body>
 <main>
   <h1>EPG España</h1>
-  <p class="sub">Guía de programación (XMLTV) de la parrilla completa de Movistar Plus+, con logos. Actualizada a diario mediante <a href="https://github.com/iptv-org/epg" style="color:#8b93a5">iptv-org/epg</a>.</p>
+  <p class="sub">Guía de programación (XMLTV) con la parrilla completa de Movistar Plus+ y Orange TV, incluidas las autonómicas (TV3, 3Cat Info, Esport3, SX3, À Punt…), con logos. Actualizada a diario mediante <a href="https://github.com/iptv-org/epg" style="color:#8b93a5">iptv-org/epg</a>.</p>
 
   <div class="stats">
     <div class="stat"><b>${channelMatches.length}</b><span>canales</span></div>
@@ -96,7 +98,7 @@ const html = `<!doctype html>
       ${channelCells}
   </div>
 
-  <footer>Generado con <a href="https://github.com/iptv-org/epg">iptv-org/epg</a>. Datos de programación propiedad de Movistar Plus+. Solo para uso personal.</footer>
+  <footer>Generado con <a href="https://github.com/iptv-org/epg">iptv-org/epg</a>. Datos de programación propiedad de sus emisoras. Solo para uso personal.</footer>
 </main>
 <script>
   for (const id of ['u1', 'u2']) {

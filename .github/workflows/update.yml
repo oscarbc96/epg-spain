@@ -21,11 +21,9 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
+      - uses: jdx/mise-action@v4
 
       - name: Clone iptv-org/epg
         run: git clone --depth 1 -b master https://github.com/iptv-org/epg.git /tmp/epg
@@ -34,21 +32,21 @@ jobs:
         run: npm install
         working-directory: /tmp/epg
 
-      - name: Build channel list from the live Movistar Plus+ lineup
-        run: node scripts/build_channels.mjs --output=/tmp/epg/spain.channels.xml --map=channels/xmltv_ids.json
+      - name: Build channel list (Movistar Plus+ + Orange TV + extras)
+        run: bun scripts/build_channels.ts --output=/tmp/epg/spain.channels.xml --map=channels/xmltv_ids.json
 
       - name: Grab EPG
         run: npm run grab --- --channels=spain.channels.xml --output=$GITHUB_WORKSPACE/public/guide.xml --days=3 --maxConnections=10 --gzip
         working-directory: /tmp/epg
 
       - name: Validate guide and build index page
-        run: node scripts/build_site.mjs --guide=public/guide.xml --output=public
+        run: bun scripts/build_site.ts --guide=public/guide.xml --output=public
 
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: public
 
-      - uses: actions/deploy-pages@v4
+      - uses: actions/deploy-pages@v5
         id: deployment

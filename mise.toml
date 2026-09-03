@@ -1,0 +1,4 @@
+[tools]
+# bun runs the repo's TypeScript scripts; node/npm run iptv-org/epg's own tooling
+bun = "latest"
+node = "latest"
